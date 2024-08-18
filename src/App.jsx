@@ -1,35 +1,48 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "./App.css";
+import { useEffect, useState } from "react";
+import Quote from "./components/Quote";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import bg from "./assets/default.jpg";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+  const [backgroundUrl, setBackgroundUrl] = useState(bg);
+
+  useEffect(() => {
+    async function fetchWallpaper() {
+      const response = await fetch(
+        `https://api.unsplash.com/photos/random?client_id=${
+          import.meta.env.VITE_UNSPLASH_ACCESS_KEY
+        }&orientation=landscape`
+      );
+      const data = await response.json();
+      setBackgroundUrl(data.urls.full);
+    }
+
+    fetchWallpaper();
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="max-h-screen flex justify-center items-center w-screen">
+      <div
+        className="flex justify-center items-center w-full"
+        style={{
+          backgroundImage: `url(${backgroundUrl})`,
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover",
+          height: "100vh",
+          // width: "100%",
+          filter: "blur(3px)",
+        }}
+      ></div>
+      <div className="absolute z-10">
+        {model !== undefined ? <Quote model={model} /> : <p>Loading...</p>}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
