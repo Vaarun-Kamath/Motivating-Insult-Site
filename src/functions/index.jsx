@@ -1,7 +1,7 @@
 let calls = 0;
 export const getQuote = async (model) => {
   const prompt =
-    "Give me a random insulting quote that appears motivational but includes humorous, sarcastic, or insulting twists.";
+    "Give me a random insulting quote that appear motivational but include humorous, sarcastic, dark twists. It should not be about dream";
   let response;
   if (calls === 1) return undefined;
   do {
